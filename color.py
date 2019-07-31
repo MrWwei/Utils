@@ -2,7 +2,9 @@
 import numpy as np
 import cv2
 
-
+'''
+判断图片是否为灰度图
+'''
 def checkGray(chip):
     chip_gray = cv2.cvtColor(chip, cv2.COLOR_BGR2GRAY)
     r, g, b = cv2.split(chip)

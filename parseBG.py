@@ -11,10 +11,8 @@ import argparse
 
 
 def parseBin(input, output):
-    # tmp = '/data1/data2/wxyt/0709气象数据/2014/tmp'
     files = os.listdir(input)
     count = 0
-    lst = []
     for file in tqdm(files):
         f = open(os.path.join(input, file), 'rb')
         # 查看源数据是否有小数
@@ -22,7 +20,8 @@ def parseBin(input, output):
             if not isinstance(i, int):
                 print(i)
 
-        img = np.zeros((400, 400, 1))  # 北京
+        img = np.zeros((400, 400, 1)) if args.name == 'bj' else np.zeros((400, 430, 1))
+        # img = np.zeros((400, 400, 1))  # 北京
         # img = np.zeros((400, 430, 1))  # 广州
         f.seek(0)
         # raw data
@@ -32,13 +31,11 @@ def parseBin(input, output):
         RawData[RawData > 80] = 0
 
         try:
-            RawArray = RawData.reshape(400, 400)  # 北京
+            RawArray = RawData.reshape(400, 400) if args.name == 'bj' else RawData.reshape(400, 430)  # 北京
             # RawArray = RawData.reshape(400, 430)  # 广州
         except:
-            RawArray = np.zeros((400, 400))  # 北京
+            RawArray = np.zeros((400, 400)) if args.name == 'bj' else np.zeros((400, 430))  # 北京
             # RawArray = np.zeros((400, 430))
-        # RawArray[RawArray > 237] = 0
-        # pic
         img[:, :, 0] = RawArray
         if not os.path.exists(output):
             os.mkdir(output)
@@ -46,7 +43,7 @@ def parseBin(input, output):
         # img[img > 58] = 0
         img[img > 0] += 32
         img[img > 0] *= 2
-        img[img > 110] = 100
+        # img[img > 110] = 100
         cv2.imwrite(imgpath, img)
         count += 1
 
@@ -55,6 +52,8 @@ def parseBin(input, output):
 
 def parse_args():
     parser = argparse.ArgumentParser(description='parse BJ and GZ')
+    parser.add_argument('--name', help="",
+                        default='bj', type=str)
     parser.add_argument('--input', help="",
                         default='/data1/data2/wxyt/0709气象数据/2014', type=str)
     parser.add_argument('--output', help="",
